@@ -2,7 +2,7 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-require_relative 'emerald_odm/version'
+require_relative 'lib/emerald_odm/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'emerald_odm'
@@ -12,13 +12,13 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'MongoDB ODM'
   spec.description   = 'Simple MongoDB ODM'
-  spec.homepage      = 'https://github.com/SPD-DataOps/atlas-email-validation'
+  spec.homepage      = 'https://github.com/MikaelSantilio/emerald-odm'
   spec.required_ruby_version = Gem::Requirement.new('>= 2.5.0')
 
-  spec.metadata['allowed_push_host'] = 'https://github.com/SPD-DataOps/atlas-email-validation'
+  spec.metadata['allowed_push_host'] = 'https://rubygems.org'
 
   spec.metadata['homepage_uri'] = spec.homepage
-  spec.metadata['source_code_uri'] = 'https://github.com/SPD-DataOps/atlas-email-validation'
+  spec.metadata['source_code_uri'] = 'https://github.com/MikaelSantilio/emerald-odm'
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
