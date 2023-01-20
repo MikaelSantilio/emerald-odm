@@ -1,38 +1,58 @@
-# Emerald::Orm
+# EmeraldODM
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/emerald/orm`. To experiment with that code, run `bin/console` for an interactive prompt.
+EmeraldODM is an simple ODM (Object-Document Mapper) framework for MongoDB in Ruby.
 
-TODO: Delete this and the text above, and describe your gem
+
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'emerald-orm'
+```bash
+gem install emerald_odm
 ```
-
-And then execute:
-
-    $ bundle install
-
-Or install it yourself as:
-
-    $ gem install emerald-orm
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+require 'emerald_odm'
 
-## Development
+# 1. Setup DB connection
+EmeraldODM.databases_settings.merge!(
+  {
+    test: [
+        [ ENV['IP_MONGO_DATABASE'] ],
+        {
+          database: 'test',
+          user: ENV['DB_LOGIN'],
+          password: ENV['DB_PASSWD'],
+          auth_source:  ENV['auth_source'],
+          max_pool_size: 20,
+        }
+    ]
+  }
+)
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+# 2. Define your model
+class Users < EmeraldODM::Collection
+  attr_accessor :_id, :name, :email, :age
+  
+  def self.collection_name
+    :users
+  end
+  
+  def self.db_name
+    :test
+  end
+end
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+# 3. Use it
+Users.find(filter: {_id: '5c9b9b9b9b9b9b9b9b9b9b9b'}).first
+
+Users.update_one(filter: {_id: '5c9b9b9b9b9b9b9b9b9b9b9b'}, set: {name: 'John Doe'}, unset: {age: 1})
+```
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/emerald-orm.
+Bug reports and pull requests are welcome on GitHub at https://github.com/MikaelSantilio/emerald-odm.
 
 
 ## License
