@@ -24,8 +24,7 @@ module EmeraldODM
     end
   end
 
-  class Collection
-
+  class AttrInitializer
     attr_reader :document
 
     def initialize(document)
@@ -36,14 +35,6 @@ module EmeraldODM
       instance_variable_set('@document', document)
     end
 
-    # @return [Symbol, nil]
-    def self.db_name
-      nil
-    end
-    # @return [Symbol, nil]
-    def self.collection_name
-      nil
-    end
     # @return [Array]
     def self.fields
       public_instance_methods = self.public_instance_methods(false).grep(/=$/)
@@ -55,6 +46,23 @@ module EmeraldODM
         fields << attr_name
       end
       fields
+    end
+
+    def nil?
+      document.nil? || document.empty?
+    end
+  end
+
+  class Collection < AttrInitializer
+
+    # @return [Symbol, nil]
+    def self.db_name
+      nil
+    end
+
+    # @return [Symbol, nil]
+    def self.collection_name
+      nil
     end
 
     # @return [Mongo::Collection] The collection
