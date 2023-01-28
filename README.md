@@ -62,7 +62,7 @@ class User < EmeraldODM::Collection
   end
   
   def self.posts=(posts)
-    @posts = posts
+    @posts = posts.map { |post| Post.new(post)}
   end
   
   class Post < EmeraldODM::AttrInitializer
