@@ -1,60 +1,121 @@
 # EmeraldODM
+EmeraldODM is an Object-Document Mapper (ODM) for Ruby that allows you to interact with MongoDB databases in a simple, Ruby-like way. It provides a high-level, easy-to-use interface for working with MongoDB documents, while abstracting away the low-level details of the MongoDB driver.
 
-EmeraldODM is an simple ODM (Object-Document Mapper) framework for MongoDB in Ruby.
+The main objective of this gem is primarily to facilitate reading data from a MongoDB database.
 
-
-
-## Installation
-
-```bash
-gem install emerald_odm
+# Installation
+To install EmeraldODM, simply add it to your Gemfile:
+```ruby
+gem 'emerald_odm'
 ```
+Then run bundle install to install the gem and its dependencies.
 
-## Usage
+# Usage
+Here's a quick example of how to use EmeraldODM to interact with a MongoDB database:
 
+## 1. Setup DB connection
 ```ruby
 require 'emerald_odm'
 
-# 1. Setup DB connection
+# Connect to the MongoDB servers before using EmeraldODM
 EmeraldODM.databases_settings.merge!(
   {
-    test: [
-        [ ENV['IP_MONGO_DATABASE'] ],
-        {
-          database: 'test',
-          user: ENV['DB_LOGIN'],
-          password: ENV['DB_PASSWD'],
-          auth_source:  ENV['auth_source'],
-          max_pool_size: 20,
-        }
-    ]
+    blog: [
+      [ '192.168.0.1:27017', '192.168.1.1:27017'],
+      {
+        database: 'blog',
+        user: ENV['MONGO_LOGIN'],
+        password: ENV['MONGO_PASSWD'],
+        auth_source:  ENV['auth_source'],
+        max_pool_size: 20,
+      }
+    ],
+    ecommerce: [
+      [ '193.168.0.1:27017', '193.168.1.1:27017'],
+      {
+        database: 'ecommerce',
+        user: ENV['MONGO_LOGIN'],
+        password: ENV['MONGO_PASSWD'],
+        auth_source:  ENV['auth_source'],
+        max_pool_size: 20,
+      }
+    ],
   }
 )
 
-# 2. Define your model
-class Users < EmeraldODM::Collection
-  attr_accessor :_id, :name, :email, :age
+```
+
+## 2. Define your model
+```ruby
+require 'emerald_odm'
+# Define a model for the "users" collection
+class User < EmeraldODM::Collection
   
+  attr_accessor :_id, :name, :email, :posts, :keywords_count
+
   def self.collection_name
     :users
   end
   
   def self.db_name
-    :test
+    :blog
   end
+  
+  def self.posts=(posts)
+    @posts = posts
+  end
+  
+  class Post < EmeraldODM::AttrInitializer
+    attr_accessor :id, :title, :body, :created_at, :updated_at
+    
+    def created_at
+      Time.parse(@created_at)
+    end
+
+    def updated_at
+      Time.parse(@updated_at)
+    end
+    
+    def keywords
+      body.scan(/\w+/)
+    end
+  end
+  
 end
 
-# 3. Use it
-Users.find(filter: {_id: '5c9b9b9b9b9b9b9b9b9b9b9b'}).first
-
-Users.update_one(filter: {_id: '5c9b9b9b9b9b9b9b9b9b9b9b'}, set: {name: 'John Doe'}, unset: {age: 1})
 ```
 
-## Contributing
+## 3. Use it
+```ruby
+# Find users using a query
+users = User.find(
+  {name: 'John Doe'}, # filter query is required
+  projection: {name: 1, email: 1, posts: 1, keywords_count: 1}, # optional, the default is to return all fields defined in the model
+  limit: 10, # optional, the default is to return all documents
+  sort: {name: 1} # optional
+)
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/MikaelSantilio/emerald-odm.
+# users is an array of User objects like Array<User>
+users.each do |user|
+  posts = user.posts
+  all_user_keywords = posts.map(&:keywords).flatten.uniq
+  User.update_one(
+    {_id: user._id},
+    set: {keywords_count: all_user_keywords.count}
+  )
+end
+```
 
+# Advanced usage
+EmeraldODM supports advanced usage such as:
 
-## License
+## Accessing the underlying MongoDB driver
+```ruby
+User.collection # returns the underlying MongoDB::Collection object
+```
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+# Contributing
+Bug reports and pull requests are welcome on GitHub at https://github.com/MikaelSantilio/emerald-odm/.
+
+# License
+The gem is available as open source under the terms of the MIT License.

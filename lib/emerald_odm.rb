@@ -79,7 +79,7 @@ module EmeraldODM
     # @param [Hash] sort The sort
     # @param [Integer] limit The limit
     # @return [Array<self>] The documents
-    def find(filter: {}, projection: {}, sort: {}, limit: 0)
+    def find(filter, projection: {}, sort: {}, limit: 0)
       self.class.validate_fields_from_stages(filter, projection, sort)
 
       if projection.empty?
@@ -93,8 +93,8 @@ module EmeraldODM
       query.to_a.map { |document| self.class.new(document) }
     end
 
-    def self.find(filter: {}, projection: {}, sort: {}, limit: 0)
-      new({}).find(filter: filter, projection: projection, sort: sort, limit: limit)
+    def self.find(filter, projection: {}, sort: {}, limit: 0)
+      new({}).find(filter, projection: projection, sort: sort, limit: limit)
     end
 
     def self.update(type, filter, set: {}, unset: {})
