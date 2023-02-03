@@ -25,20 +25,20 @@ module EmeraldODM
   end
 
   class AttrInitializer
-    attr_reader :document
+    attr_reader :_document
 
     def initialize(document)
       self.class.fields.each do |field|
         document_value = document[field]
         send("#{field}=", document_value) unless document_value.nil?
       end
-      instance_variable_set('@document', document)
+      instance_variable_set('@_document', document)
     end
 
     # @return [Array]
     def self.fields
       public_instance_methods = self.public_instance_methods(false).grep(/=$/)
-      rejected_attr_names = %w[document]
+      rejected_attr_names = %w[_document]
       fields = []
       public_instance_methods.each do |attr|
         attr_name = attr.to_s.gsub('=', '')
@@ -50,6 +50,41 @@ module EmeraldODM
 
     def nil?
       document.nil? || document.empty?
+    end
+
+    def self.array_to_h(array)
+      array.map do |item|
+        if item.is_a?(AttrInitializer)
+          item.to_h
+        elsif item.is_a?(Array)
+          array_to_h(item)
+        else
+          item
+        end
+      end
+    end
+
+    def to_h
+      hash = {}
+      known_fields = self.class.fields
+      unknown_fields = document.keys - known_fields
+      unknown_fields.reject! { |field| field.start_with?('_') }
+      known_fields.each do |field|
+        value = send(field)
+        if value.is_a?(AttrInitializer)
+          hash[field] = value.to_h
+        elsif value.is_a?(Array)
+          hash[field] = self.class.array_to_h(value)
+        else
+          hash[field] = value
+        end
+      end
+      unknown_fields.each do |field|
+        value = document[field]
+        hash[field] = value
+      end
+
+      hash
     end
   end
 

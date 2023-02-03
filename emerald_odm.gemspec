@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['mikael.santilio@gmail.com']
 
   spec.summary       = 'MongoDB ODM'
-  spec.description   = 'Simple MongoDB ODM'
+  spec.description   = 'A simple MongoDB ODM without Active Record'
   spec.homepage      = 'https://github.com/MikaelSantilio/emerald-odm'
   spec.required_ruby_version = Gem::Requirement.new('>= 2.5.0')
 
