@@ -49,7 +49,7 @@ module EmeraldODM
     end
 
     def nil?
-      document.nil? || document.empty?
+      _document.nil? || _document.empty?
     end
 
     def self.array_to_h(array)
@@ -67,7 +67,7 @@ module EmeraldODM
     def to_h
       hash = {}
       known_fields = self.class.fields
-      unknown_fields = document.keys - known_fields
+      unknown_fields = _document.keys - known_fields
       unknown_fields.reject! { |field| field.start_with?('_') }
       known_fields.each do |field|
         value = send(field)
@@ -80,7 +80,7 @@ module EmeraldODM
         end
       end
       unknown_fields.each do |field|
-        value = document[field]
+        value = _document[field]
         hash[field] = value
       end
 
