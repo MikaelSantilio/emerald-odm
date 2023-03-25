@@ -29,7 +29,11 @@ module EmeraldODM
 
     # @param [Hash, BSON::Document] document The document to be used to initialize the object
     def initialize(document)
-      document = BSON::Document.new(document) if document.is_a?(Hash)
+      if document.instance_of?(Hash)
+        document = BSON::Document.new(document)
+      elsif document.nil?
+        document = BSON::Document.new
+      end
       self.class.fields.each do |field|
         document_value = document[field]
         send("#{field}=", document_value)
@@ -51,6 +55,10 @@ module EmeraldODM
     end
 
     def nil?
+      _document.nil? || _document.empty?
+    end
+
+    def empty?
       _document.nil? || _document.empty?
     end
 
