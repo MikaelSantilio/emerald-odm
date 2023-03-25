@@ -27,10 +27,12 @@ module EmeraldODM
   class AttrInitializer
     attr_reader :_document
 
+    # @param [Hash, BSON::Document] document The document to be used to initialize the object
     def initialize(document)
+      document = BSON::Document.new(document) if document.is_a?(Hash)
       self.class.fields.each do |field|
         document_value = document[field]
-        send("#{field}=", document_value) unless document_value.nil?
+        send("#{field}=", document_value)
       end
       instance_variable_set('@_document', document)
     end
